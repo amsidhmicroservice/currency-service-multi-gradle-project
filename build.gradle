@@ -9,7 +9,13 @@ plugins {
     id 'org.sonarqube' version '4.4.1.3373'
 }
 
-subprojects {
+def allJavaProjects = [
+        project(':ms-common'),
+        project(':currency-exchange'),
+        project(':currency-conversion')
+]
+//subprojects {
+configure(allJavaProjects) {
 
     group = 'com.amsidh.mvc'
     version = '0.0.1-SNAPSHOT'
@@ -32,9 +38,31 @@ subprojects {
         jcenter()
     }
 
-    dependencies {
-        //checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.41'
+    configurations {
+        compileOnly.extendsFrom annotationProcessor
+        testCompileOnly.extendsFrom annotationProcessor
+        testAnnotationProcessor.extendsFrom annotationProcessor
     }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
+        implementation 'uk.org.webcompere:model-assert:1.0.0'
+        // Log Message in Json
+        implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+        implementation 'ch.qos.logback:logback-classic'
+        implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
     dependencyManagement {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.2.3")
@@ -141,15 +169,13 @@ subprojects {
         properties {
 
             property "sonar.gradle.skipCompile", true
-            File file = new File("${projectDir}/src/itest/java/");
+            File file = new File("${projectDir}/src/itest/java/")
             if (file.exists()) {
-                System.out.println("itest exists");
                 properties["sonar.tests"] += "${projectDir}/src/itest/java/"
             }
             properties["sonar.junit.reportPaths"] += "$buildDir/itest-results/"
-            file = new File("$buildDir/classes/java/itest/");
+            file = new File("$buildDir/classes/java/itest/")
             if (file.exists()) {
-                System.out.println("itest libraries exists");
                 properties["sonar.java.test.binaries"] += "$buildDir/classes/java/itest/"
             }
             properties["sonar.jacoco.reportPaths"] += "$buildDir/jacoco/itest/jacocoTest.exec"
@@ -157,3 +183,10 @@ subprojects {
     }
 
 }
+
+
+def allServices = [
+        project(':currency-exchange'),
+        project(':currency-conversion')
+]
+
