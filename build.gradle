@@ -1,0 +1,159 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
+plugins {
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'pmd'
+    id "com.github.spotbugs" version "6.0.8"
+    id 'org.sonarqube' version '4.4.1.3373'
+}
+
+subprojects {
+
+    group = 'com.amsidh.mvc'
+    version = '0.0.1-SNAPSHOT'
+
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+    apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'org.sonarqube'
+    java {
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        //checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.41'
+    }
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.2.3")
+        }
+    }
+
+    // Set source encoding
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    // Set reporting output encoding
+    tasks.withType(Javadoc).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    // Define tasks for generating Javadoc and source JARs
+    tasks.register('javadocJar', Jar) {
+        dependsOn javadoc
+        from javadoc.destinationDir
+        archiveClassifier.set('javadoc')
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    tasks.register('sourcesJar', Jar) {
+        from sourceSets.main.allSource
+        archiveClassifier.set('sources')
+    }
+
+    artifacts {
+        archives javadocJar
+        archives sourcesJar
+    }
+
+    jacoco {
+        toolVersion = "0.8.11"
+    }
+
+    test {
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = false
+            csv.required = false
+            html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
+        }
+    }
+
+    // Checkstyle configuration
+    checkstyle {
+        toolVersion = '10.14.2'
+        configFile = file("${rootDir}/codequality/checkstyle.xml")
+        // Adjust the path to your Checkstyle configuration file
+        checkstyleTest.enabled = false
+        showViolations = true
+        ignoreFailures = true
+    }
+    // SpotBug Configuration
+    spotbugs {
+        ignoreFailures = true
+        showProgress = true
+        excludeFilter = rootProject.file('codequality/findbugs-exclude.xml')
+    }
+    tasks.withType(SpotBugsTask).configureEach {
+        reports {
+            html {
+                required = true
+                stylesheet = 'fancy-hist.xsl'
+                destination(file("$buildDir/reports/spotbugs/spotbugsHtml"))
+            }
+            xml {
+                required = false
+            }
+        }
+    }
+
+    // PMD configuration
+    pmd {
+        toolVersion = '7.0.0-rc4' // Update to the latest PMD version if necessary
+        ruleSets = [] // Add rule sets if needed, e.g., ruleSets = ['basic', 'design']
+        ruleSetFiles = getRootProject().files('codequality/pmd-ruleset.xml') // Add custom rule set files if needed
+        ignoreFailures = true // Set to true if you want the build to continue even if PMD finds violations
+        consoleOutput = true // Set to true to display PMD output in the console
+        pmdTest.enabled = false
+        reportsDir = file("$buildDir/reports/pmd") // Set the directory for PMD reports
+    }
+
+    tasks.withType(Pmd).configureEach {
+        exclude '**/test/**' // Exclude test source directories
+    }
+
+    tasks.register('sonarqube').configure {
+        dependsOn jacocoTestReport
+    }
+
+    sonarqube {
+
+        properties {
+
+            property "sonar.gradle.skipCompile", true
+            File file = new File("${projectDir}/src/itest/java/");
+            if (file.exists()) {
+                System.out.println("itest exists");
+                properties["sonar.tests"] += "${projectDir}/src/itest/java/"
+            }
+            properties["sonar.junit.reportPaths"] += "$buildDir/itest-results/"
+            file = new File("$buildDir/classes/java/itest/");
+            if (file.exists()) {
+                System.out.println("itest libraries exists");
+                properties["sonar.java.test.binaries"] += "$buildDir/classes/java/itest/"
+            }
+            properties["sonar.jacoco.reportPaths"] += "$buildDir/jacoco/itest/jacocoTest.exec"
+        }
+    }
+
+}

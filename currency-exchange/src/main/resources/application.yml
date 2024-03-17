@@ -1,0 +1,147 @@
+server:
+  port: 8181
+
+spring:
+  profiles:
+    include:
+      - common
+    active:
+      - dev
+  application:
+    name: currency-exchange
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - dev
+  #H2 Database configuration
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:currency_exchange;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS currency_exchange
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  sql:
+    init:
+      platform: h2
+      mode: always
+      schema-locations: classpath*:schema/exchange-schema.sql
+      data-locations: classpath*:data/exchange-data.sql
+  database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888
+        instance:
+          prefer-ip: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - uat
+  #H2 Database configuration
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:currency_exchange_uat;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS currency_exchange_uat
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  sql:
+    init:
+      platform: h2
+      mode: always
+      schema-locations: classpath*:schema/exchange-schema.sql
+      data-locations: classpath*:data/exchange-data.sql
+  database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888
+        instance:
+          prefer-ip: true
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - prod
+  #H2 Database configuration
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:currency_exchange_prod;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS currency_exchange_prod
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  sql:
+    init:
+      platform: h2
+      mode: always
+      schema-locations: classpath*:schema/exchange-schema.sql
+      data-locations: classpath*:data/exchange-data.sql
+  database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888
+        instance:
+          prefer-ip: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - test
+  #H2 Database configuration
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:currency_exchange_test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS currency_exchange_test
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  sql:
+    init:
+      platform: h2
+      mode: always
+      schema-locations: classpath*:schema/exchange-schema.sql
+      data-locations: classpath*:data/exchange-data.sql
+  database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true

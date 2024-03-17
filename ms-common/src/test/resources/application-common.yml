@@ -1,0 +1,8 @@
+info:
+  app:
+    version: NoVersion
+HOSTNAME: NodeTest
+
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

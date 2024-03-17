@@ -1,0 +1,55 @@
+server:
+  port: 8282
+
+spring:
+  profiles:
+    include:
+      - common
+    active:
+      - dev
+  application:
+    name: currency-conversion
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - dev
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888
+        instance:
+          prefer-ip: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - uat
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888
+        instance:
+          prefer-ip: true
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - prod
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888
+        instance:
+          service-host-type: ip
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - test

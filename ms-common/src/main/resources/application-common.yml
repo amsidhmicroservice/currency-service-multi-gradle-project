@@ -1,0 +1,22 @@
+info:
+  app:
+    developer:
+      name: Amsidh Lokhande
+      emailId: amsidhmicroservice@gmail.com
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: info
+    web: info
+    sql: debug
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    com.amsidh.mvc: DEBUG
