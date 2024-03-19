@@ -12,6 +12,10 @@ management:
   endpoint:
     health:
       show-details: always
+  # Distributed Tracing Configuration
+  tracing:
+    sampling:
+      probability: 1.0
 
 logging:
   level:

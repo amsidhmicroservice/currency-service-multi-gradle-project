@@ -1,80 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <springProperty scope="context" name="service-name" source="spring.application.name"/>
-    <springProperty scope="context" name="version" source="info.app.version"/>
-
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+    <include
+            resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <springProperty scope="context" name="service-name"
+                    source="spring.application.name" />
+    <springProperty scope="context" name="version"
+                    source="info.app.version" />
+    <appender name="stdout"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder
+                class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
-                <!-- Configure Timestamp and TimeZone related changes -->
                 <timestamp>
                     <fieldName>@timestamp</fieldName>
                     <pattern>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</pattern>
-                    <timeZone>DEFAULT</timeZone>
+                    <timeZone>Asia/Kolkata</timeZone>
                 </timestamp>
-                <!--<sequence/>-->
-                <!-- Configure Application Context related changes -->
-                <context/>
-                <!-- MDC Configuration-->
+                <context />
+
                 <pattern>
                     <pattern>
                         <omitEmptyFields>true</omitEmptyFields>
                         {
-                        "correlationId": "%mdc{X-B3-TraceId}",
-                        "span_id": "%mdc{X-B3-SpanId}",
+                        "correlationId": "%mdc{traceId}",
+                        "request-tracking": {
+                        "span_id": "%mdc{spanId}",
                         "parent_span_id": "%mdc{X-B3-ParentSpanId}",
-                        "exported": "%mdc{spanExportable}",
-                        "SystemName":"%mdc{BackendSystemName}"
+                        "exported": "%mdc{spanExportable}"
+                        }
                         }
                     </pattern>
                 </pattern>
-                <!-- Log level Configuration-->
+
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
                 <logLevel>
                     <fieldName>severity</fieldName>
                 </logLevel>
-                <!-- Thread name Configuration-->
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "message": "%message"
+                        }
+                    </pattern>
+                </pattern>
+                <callerData>
+                    <fieldName>log_class_info</fieldName>
+                    <classFieldName>log_source_class</classFieldName>
+                    <methodFieldName>log_source_method</methodFieldName>
+                    <lineFieldName>log_source_line</lineFieldName>
+                    <fileFieldName>[ignore]</fileFieldName>
+                </callerData>
                 <threadName>
                     <fieldName>thread</fieldName>
                 </threadName>
-                <!-- Caller Class Detail Configuration-->
-                <callerData>
-                    <fieldName>logClassInfo</fieldName>
-                    <classFieldName>class</classFieldName>
-                    <methodFieldName>method</methodFieldName>
-                    <lineFieldName>line</lineFieldName>
-                    <fileFieldName>file</fileFieldName>
-                </callerData>
+
                 <arguments>
-                    <includeNonStructuredArguments>false</includeNonStructuredArguments>
+                    <includeNonStructuredArguments>true</includeNonStructuredArguments>
                 </arguments>
-                <logstashMarkers/>
-
-                <message>
-                    <fieldName>message</fieldName>
-                </message>
-
-                <!-- (Only if a throwable was logged) Computes and outputs a hexadecimal hash of the throwable stack.
-                    This helps identifying several occurrences of the same error
-                    https://github.com/logfellow/logstash-logback-encoder/blob/main/stack-hash.md
-                    -->
                 <stackHash>
                     <fieldName>exception-hash</fieldName>
                 </stackHash>
                 <stackTrace>
                     <fieldName>exception</fieldName>
-                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
-                        <inlineHash>true</inlineHash>
-                        <shortenedClassNameLength>short</shortenedClassNameLength>
-                        <maxDepthPerThrowable>short</maxDepthPerThrowable>
-                        <maxLength>short</maxLength>
+                    <throwableConverter
+                            class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <shortenedClassNameLength>30</shortenedClassNameLength>
+                        <maxDepthPerThrowable>10</maxDepthPerThrowable>
+                        <maxLength>150</maxLength>
+                        <rootCauseFirst>true</rootCauseFirst>
                     </throwableConverter>
                 </stackTrace>
-
+                <logstashMarkers />
             </providers>
         </encoder>
+
+
     </appender>
+
+
     <root level="info">
-        <appender-ref ref="stdout"/>
+        <appender-ref ref="stdout" />
     </root>
 </configuration>

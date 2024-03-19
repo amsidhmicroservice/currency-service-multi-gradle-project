@@ -2,11 +2,6 @@ plugins {
     id 'org.springframework.boot' version '3.2.3'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-    systemProperty 'de.adesso.junitinsights.enabled', 'true'
-}
-
 bootJar {
     enabled = false
 }
