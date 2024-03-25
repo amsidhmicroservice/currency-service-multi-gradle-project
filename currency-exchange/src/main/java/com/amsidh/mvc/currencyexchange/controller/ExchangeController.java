@@ -1,13 +1,10 @@
 package com.amsidh.mvc.currencyexchange.controller;
 
-import com.amsidh.mvc.config.TracingUtils;
 import com.amsidh.mvc.currencyexchange.entity.Exchange;
 import com.amsidh.mvc.currencyexchange.exception.MyCustomException;
 import com.amsidh.mvc.currencyexchange.repository.ExchangeRepository;
 import com.amsidh.mvc.currencyexchange.service.MyService;
 import com.amsidh.mvc.service.InstanceInformationService;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.context.Context;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -17,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @RequiredArgsConstructor
