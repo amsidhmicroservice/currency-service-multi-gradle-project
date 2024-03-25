@@ -1,9 +1,13 @@
 package com.amsidh.mvc.currencyexchange.controller;
 
+import com.amsidh.mvc.config.TracingUtils;
 import com.amsidh.mvc.currencyexchange.entity.Exchange;
 import com.amsidh.mvc.currencyexchange.exception.MyCustomException;
 import com.amsidh.mvc.currencyexchange.repository.ExchangeRepository;
+import com.amsidh.mvc.currencyexchange.service.MyService;
 import com.amsidh.mvc.service.InstanceInformationService;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -12,6 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -19,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExchangeController {
     private final ExchangeRepository exchangeRepository;
     private final InstanceInformationService instanceInformationService;
+    private final MyService myService;
 
     @GetMapping("/")
     public String healthCheck() {
@@ -31,7 +39,7 @@ public class ExchangeController {
     //http://34.121.35.177:8181/currency-exchange/USD/to/INR
     @GetMapping(value = "/{currencyFrom}/to/{currencyTo}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public Exchange getCurrencyExchange(@PathVariable("currencyFrom") String currencyFrom, @PathVariable("currencyTo") String currencyTo) {
-        log.info("=======Start Request=======");
+        log.info("=======start request=======");
         log.info("Inside getCurrencyExchange method of ExchangeRepository");
         final Exchange exchange = exchangeRepository.findExchangeByCurrencyFromAndCurrencyTo(currencyFrom, currencyTo);
         if (null == exchange) {
@@ -40,6 +48,23 @@ public class ExchangeController {
         exchange.setExchangeEnvironmentInfo(instanceInformationService.retrieveInstanceInfo());
         log.info("Returning the response from currency-conversion service");
         log.info("=======End Request=======");
+
+
+        log.info("Before CompletableFuture call");
+        Context context = Context.current(); // Retrieve current context or create a new one
+        CompletableFuture<Void> future = TracingUtils.traceAsyncOperation(context, () -> {
+            log.info("Before calling processMyRequest");
+            myService.processMyRequest("Amsidh");
+            log.info("After calling processMyRequest");
+        });
+
+        // Optionally, you can handle the completion of the CompletableFuture
+        future.thenRun(() -> {
+            log.info("After returning CompletableFuture<Void> future ");
+            // Code to execute after async operation completes
+        });
+
+        log.info("After CompletableFuture call");
         return exchange;
     }
 
