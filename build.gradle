@@ -42,8 +42,6 @@ configure(allJavaProjects) {
 
         // Distributed Tracing
         runtimeOnly "io.opentelemetry.javaagent:opentelemetry-javaagent:1.32.0"
-        implementation 'io.micrometer:micrometer-registry-prometheus'
-        implementation 'io.opentelemetry:opentelemetry-context:1.36.0'
         implementation 'io.opentelemetry:opentelemetry-sdk:1.36.0'
 
         // Log Message in Json

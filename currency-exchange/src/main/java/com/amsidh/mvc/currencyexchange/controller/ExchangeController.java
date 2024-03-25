@@ -49,22 +49,10 @@ public class ExchangeController {
         log.info("Returning the response from currency-conversion service");
         log.info("=======End Request=======");
 
-
         log.info("Before CompletableFuture call");
-        Context context = Context.current(); // Retrieve current context or create a new one
-        CompletableFuture<Void> future = TracingUtils.traceAsyncOperation(context, () -> {
-            log.info("Before calling processMyRequest");
-            myService.processMyRequest("Amsidh");
-            log.info("After calling processMyRequest");
-        });
-
-        // Optionally, you can handle the completion of the CompletableFuture
-        future.thenRun(() -> {
-            log.info("After returning CompletableFuture<Void> future ");
-            // Code to execute after async operation completes
-        });
-
+        CompletableFuture.runAsync(() -> myService.processMyRequest("Amsidh"));
         log.info("After CompletableFuture call");
+
         return exchange;
     }
 
