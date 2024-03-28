@@ -22,9 +22,9 @@
                     <pattern>
                         <omitEmptyFields>true</omitEmptyFields>
                         {
-                        "correlationId": "%X{trace_id}",
+                        "correlationId": "%X{traceId}",
                         "request-tracking": {
-                        "span_id": "%X{span_id}",
+                        "span_id": "%X{spanId}",
                         "parent_span_id": "%mdc{X-B3-ParentSpanId}",
                         "exported": "%X{trace_flags}"
                         }
@@ -79,10 +79,6 @@
 
 
     </appender>
-    <!-- Just wrap your logging appender, for example ConsoleAppender, with OpenTelemetryAppender -->
-    <!--<appender name="olte" class="io.opentelemetry.instrumentation.logback.mdc.v1_0.OpenTelemetryAppender">
-        <appender-ref ref="stdout"/>
-    </appender>-->
     <root level="info">
         <appender-ref ref="stdout" />
     </root>
